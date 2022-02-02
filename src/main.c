@@ -30,10 +30,10 @@ void play_music() NONBANKED {
     } else {
         if (mute_flag) {
             hUGE_mute_mask = 0, hUGE_current_wave = 255, mute_flag = FALSE;
-            if (sound_mask & 1) NR12_REG = 0, NR14_REG = 0x80; 
-            if (sound_mask & 2) NR22_REG = 0, NR24_REG = 0x80; 
+            if (sound_mask & 1) NR12_REG = 0, NR14_REG = 0xff; 
+            if (sound_mask & 2) NR22_REG = 0, NR24_REG = 0xff; 
             if (sound_mask & 4) NR32_REG = 0; 
-            if (sound_mask & 8) NR42_REG = 0, NR44_REG = 0x80; 
+            if (sound_mask & 8) NR42_REG = 0, NR44_REG = 0xff; 
         }
     }
     if (current_track_bank == 255) return;
@@ -41,7 +41,7 @@ void play_music() NONBANKED {
     SWITCH_ROM(current_track_bank);
     if (next_track) {
         NR12_REG = NR22_REG = NR32_REG = NR42_REG = 0;  // shut channels
-        NR14_REG = NR24_REG = NR44_REG = 0x80;          // retrigger channels
+        NR14_REG = NR24_REG = NR44_REG = 0xff;          // retrigger channels
         hUGE_init(next_track);
         next_track = 0;
     } else hUGE_dosound();
