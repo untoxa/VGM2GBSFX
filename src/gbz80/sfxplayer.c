@@ -33,7 +33,6 @@ lbl:
         or a
         ld d, a                     ; d = frame channel count
         jr z, 6$
-
 2$:
         ld a, (hl+)
         ld b, a                     ; a = b = channel no + register mask
@@ -69,11 +68,9 @@ lbl:
 4$:
         dec d
         jr nz, 2$
-
 6$:
         inc d                       ; return 1 if still playing
 0$:
-
         ld a, l                     ; save current position
         ld (#_sfx_play_sample), a
         ld a, h
