@@ -16,14 +16,22 @@
 
 // #define FORCE_CUT_SFX    // don't cut by default 
 
+#define STOP_MUSIC_BANK 0xffu
+
+inline void sound_cut() {
+    NR12_REG = NR22_REG = NR32_REG = NR42_REG = 0;      // shut channels
+    NR14_REG = NR24_REG = NR44_REG = 0b11000000;        // retrigger channels
+}
+
 void hUGETrackerRoutine(unsigned char ch, unsigned char param, unsigned char tick) NONBANKED {
     ch; param; tick;
 }
 
-uint8_t current_track_bank = 255;
+uint8_t current_track_bank = 0xff;
 uint8_t mute_flag = 0, sound_mask = 0;
 const hUGESong_t * next_track;
 uint8_t play_isr_counter = 0;
+uint8_t play_isr_pause = FALSE;
 void play_isr() NONBANKED {
     if (sfx_play_isr()) {
         hUGE_mute_mask = sound_mask, mute_flag = TRUE; 
@@ -39,14 +47,14 @@ void play_isr() NONBANKED {
             sound_mask = 0; 
         }
     }
-    if (current_track_bank == 255) return;
+    if (play_isr_pause) return;
+    if (current_track_bank == STOP_MUSIC_BANK) return;
     play_isr_counter++;
     if (play_isr_counter &= 3) return;
     uint8_t save_bank = _current_bank;
     SWITCH_ROM(current_track_bank);
     if (next_track) {
-        NR12_REG = NR22_REG = NR32_REG = NR42_REG = 0;  // shut channels
-        NR14_REG = NR24_REG = NR44_REG = 0xff;          // retrigger channels
+        sound_cut();
         hUGE_init(next_track);
         next_track = 0;
     } else hUGE_dosound();
@@ -55,9 +63,19 @@ void play_isr() NONBANKED {
 inline void load_music(uint8_t bank, const hUGESong_t * data) CRITICAL {
     next_track = data; current_track_bank = bank;
 }
+void pause_music(uint8_t pause) {
+    play_isr_pause = pause;
+    if (pause) sound_cut();
+}
+void stop_music() {
+    current_track_bank = STOP_MUSIC_BANK;
+    sound_cut();
+}
 
 void main() {
-    NR52_REG = 0x80, NR51_REG = 0xFF, NR50_REG = 0x77; // enable sound
+    static uint8_t music_paused = FALSE;
+
+    NR52_REG = 0x80, NR51_REG = 0xFF, NR50_REG = 0x77;  // enable sound
     
     CRITICAL {
         TMA_REG = 0xC0u, TAC_REG = 0x07u;
@@ -65,16 +83,18 @@ void main() {
         set_interrupts(VBL_IFLAG | TIM_IFLAG);
     }
 
-    puts("A     - module 1\nB     - module 2\nUP    - sound 1\nDOWN  - sound 2\nLEFT  - WAVE 1\nRIGHT - WAVE 2");
+    puts("A     - module 1\nB     - module 2\nUP    - sound 1\nDOWN  - sound 2\nLEFT  - WAVE 1\nRIGHT - WAVE 2\nSELECT- music STOP\nSTART - music START");
 
     while (TRUE) {
         uint8_t joy = joypad();
-        if (joy & J_A)     load_music(BANK(music_track_0__Data), &music_track_0__Data);
-        if (joy & J_B)     load_music(BANK(music_track_1__Data), &music_track_1__Data);
-        if (joy & J_UP)    sound_mask |= MUTE_MASK_sfx_00,   sfx_set_sample(BANK(sfx_00), sfx_00);
-        if (joy & J_DOWN)  sound_mask |= MUTE_MASK_sfx_00_2, sfx_set_sample(BANK(sfx_00_2), sfx_00_2);
-        if (joy & J_LEFT)  sound_mask |= 0b00000100,         sfx_set_sample(BANK(icq_message), icq_message);
-        if (joy & J_RIGHT) sound_mask |= 0b00000100,         sfx_set_sample(BANK(quang2), quang2);
+        if (joy & J_A)      load_music(BANK(music_track_0__Data), &music_track_0__Data), pause_music(music_paused = FALSE);
+        if (joy & J_B)      load_music(BANK(music_track_1__Data), &music_track_1__Data), pause_music(music_paused = FALSE);
+        if (joy & J_UP)     sound_mask |= MUTE_MASK_sfx_00,   sfx_set_sample(BANK(sfx_00), sfx_00);
+        if (joy & J_DOWN)   sound_mask |= MUTE_MASK_sfx_00_2, sfx_set_sample(BANK(sfx_00_2), sfx_00_2);
+        if (joy & J_LEFT)   sound_mask |= 0b00000100,         sfx_set_sample(BANK(icq_message), icq_message);
+        if (joy & J_RIGHT)  sound_mask |= 0b00000100,         sfx_set_sample(BANK(quang2), quang2);
+        if (joy & J_SELECT) stop_music(), pause_music(music_paused = FALSE);
+        if (joy & J_START)  pause_music(music_paused = (!music_paused));
         if (joy) waitpadup();
         wait_vbl_done();
     }
