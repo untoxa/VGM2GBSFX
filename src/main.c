@@ -11,6 +11,8 @@
 #include "sfx_00.h"         // generated from VGM
 #include "sfx_00_2.h"       // generated from VGM
 
+// #define FORCE_CUT_SFX    // don't cut by default 
+
 void hUGETrackerRoutine(unsigned char ch, unsigned char param, unsigned char tick) NONBANKED {
     ch; param; tick;
 }
@@ -24,10 +26,12 @@ void play_music() NONBANKED {
     } else {
         if (mute_flag) {
             hUGE_mute_mask = 0, hUGE_current_wave = 255, mute_flag = FALSE;
-            if (sound_mask & 1) NR12_REG = 0, NR14_REG = 0xff; 
-            if (sound_mask & 2) NR22_REG = 0, NR24_REG = 0xff; 
+            #ifdef FORCE_CUT_SFX
+            if (sound_mask & 1) NR12_REG = 0, NR14_REG = 0b11000000; 
+            if (sound_mask & 2) NR22_REG = 0, NR24_REG = 0b11000000; 
             if (sound_mask & 4) NR32_REG = 0; 
-            if (sound_mask & 8) NR42_REG = 0, NR44_REG = 0xff; 
+            if (sound_mask & 8) NR42_REG = 0, NR44_REG = 0b11000000;
+            #endif 
         }
     }
     if (current_track_bank == 255) return;
