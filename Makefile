@@ -23,7 +23,7 @@ LCCFLAGS += -Wl-j -autobank -Wb-ext=.rel -Wb-v # MBC + Autobanking related flags
 # LCCFLAGS += -debug # Uncomment to enable debug output
 # LCCFLAGS += -v     # Uncomment for lcc verbose output
 
-CFLAGS = -Wf-Iinclude -Wf-Isrc/$(PORT) -Wf-Iobj/$(PORT)
+CFLAGS = -Iinclude -Ires -Isrc/$(PORT) -Iobj/$(PLAT)
 
 # You can set the name of the ROM file here
 PROJECTNAME = libtest
@@ -41,6 +41,7 @@ RSOURCES    = $(foreach dir,$(RESDIR),$(notdir $(wildcard $(dir)/*.vgm)))
 CSOURCES    = $(foreach dir,$(SRCDIR),$(notdir $(wildcard $(dir)/*.c))) $(foreach dir,$(SRCPLAT),$(notdir $(wildcard $(dir)/*.c))) $(foreach dir,$(RESDIR),$(notdir $(wildcard $(dir)/*.c)))
 ASMSOURCES  = $(foreach dir,$(SRCDIR),$(notdir $(wildcard $(dir)/*.s))) $(foreach dir,$(SRCPLAT),$(notdir $(wildcard $(dir)/*.s)))
 OBJS        = $(CSOURCES:%.c=$(OBJDIR)/%.o) $(ASMSOURCES:%.s=$(OBJDIR)/%.o) $(RSOURCES:%.vgm=$(OBJDIR)/%.o)
+RESOBJ      = $(RSOURCES:%.vgm=$(OBJDIR)/%.o)
 
 DEPENDANT   = $(CSOURCES:%.c=$(OBJDIR)/%.o)
 
@@ -52,10 +53,10 @@ DEPS = $(DEPENDANT:%.o=%.d)
 
 -include $(DEPS)
 
-$(OBJDIR)/%.c: $(RESDIR)/%.vgm
+$(OBJDIR)/%.c:	$(RESDIR)/%.vgm
 	python utils/vgm2data.py -v $< -o $@ -5 -w -3
 
-$(OBJDIR)/%.o: $(OBJDIR)/%.c
+$(OBJDIR)/%.o:	$(OBJDIR)/%.c
 	$(LCC) $(CFLAGS) -c -o $@ $<
 
 # Compile .c files in "src/" to .o object files
@@ -78,13 +79,8 @@ $(OBJDIR)/%.o:	$(SRCPLAT)/%.s
 $(OBJDIR)/%.o:	$(SRCDIR)/%.s
 	$(LCC) $(CFLAGS) -c -o $@ $<
 
-# If needed, compile .c files i n"src/" to .s assembly files
-# (not required if .c is compiled directly to .o)
-$(OBJDIR)/%.s:	$(SRCDIR)/%.c
-	$(LCC) $(CFLAGS) -S -o $@ $<
-
 # Link the compiled object files into a .gb ROM file
-$(BINS):	$(OBJS)
+$(BINS):	$(RESOBJ) $(OBJS)
 	$(LCC) $(LCCFLAGS) $(CFLAGS) -o $(BINDIR)/$(PROJECTNAME).$(EXT) $(OBJS)
 
 clean:

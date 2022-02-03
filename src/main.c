@@ -5,17 +5,11 @@
 #include "sfxplayer.h"
 #include "hUGEDriver.h"
 
-extern const hUGESong_t music_track_0__Data;
-BANKREF_EXTERN(music_track_0__Data)
+#include "music_track_0__Data.h" 
+#include "music_track_1__Data.h"
 
-extern const hUGESong_t music_track_1__Data;
-BANKREF_EXTERN(music_track_1__Data)
-
-extern const uint8_t sfx_00[]; 
-BANKREF_EXTERN(sfx_00)
-
-extern const uint8_t sfx_00_2[]; 
-BANKREF_EXTERN(sfx_00_2)
+#include "sfx_00.h"         // generated from VGM
+#include "sfx_00_2.h"       // generated from VGM
 
 void hUGETrackerRoutine(unsigned char ch, unsigned char param, unsigned char tick) NONBANKED {
     ch; param; tick;
@@ -71,11 +65,11 @@ void main() {
             waitpadup();
         }
         if (joy & J_UP) {
-            sound_mask = 0b00001011;
+            sound_mask = MUTE_MASK_sfx_00;
             sfx_set_sample(BANK(sfx_00), sfx_00);
         }
         if (joy & J_DOWN) {
-            sound_mask = 0b00001011;
+            sound_mask = MUTE_MASK_sfx_00_2;
             sfx_set_sample(BANK(sfx_00_2), sfx_00_2);
         }
         wait_vbl_done();

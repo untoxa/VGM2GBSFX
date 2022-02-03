@@ -58,16 +58,8 @@ def main(argv=None):
         print("waveform data update disabled")
                
     with open(str(infilename), "rb") as inf:
-        if outfilename.suffix == ".c":
-            with open(str(outfilename.with_suffix('.h')), "wb") as hdrf:
-                hdrf.write(bytes(("#ifndef __{0:s}_INCLUDE__\n"
-                                  "#define __{0:s}_INCLUDE__\n\n"
-                                  "#include <gbdk/platform.h>\n"
-                                  "#include <stdint.h>\n\n"
-                                  "BANKREF_EXTERN({0:s})\n"
-                                  "extern const uint8_t {0:s}[];\n\n"
-                                  "#endif\n").format(identifier), "ascii"))
-            
+        channel_mute_mask = 0
+        # output C source file
         with open(str(outfilename), "wb") as outf:                
             if inf.read(4) != b'Vgm ':
                 print("invalid file format")
@@ -158,6 +150,7 @@ def main(argv=None):
                             if (mask != j):
                                 count += 1
                                 result = "{}0b{:08b},{}".format(result, mask, tmp)
+                                channel_mute_mask |= (1 << j)
 
                     # output result
                     result = "{},{}\n".format(count, result)
@@ -170,6 +163,18 @@ def main(argv=None):
                     print("ERROR: unsupported command 0x{:02X}".format(unpack('B', data)[0]))
                     sys.exit(1)
                 data = inf.read(1)
+
+        # output C header file
+        if outfilename.suffix == ".c":
+            with open(str(outfilename.with_suffix('.h')), "wb") as hdrf:
+                hdrf.write(bytes(("#ifndef __{0:s}_INCLUDE__\n"
+                                  "#define __{0:s}_INCLUDE__\n\n"
+                                  "#include <gbdk/platform.h>\n"
+                                  "#include <stdint.h>\n\n"
+                                  "#define MUTE_MASK_{0:s} 0b{1:08b}\n\n"
+                                  "BANKREF_EXTERN({0:s})\n"
+                                  "extern const uint8_t {0:s}[];\n\n"
+                                  "#endif\n").format(identifier, channel_mute_mask), "ascii"))
         
 if __name__=='__main__':
     main()
