@@ -4,7 +4,12 @@
 #include <gbdk/platform.h>
 #include <stdint.h>
 
-void sfx_set_sample(UINT8 bank, const UINT8 * sample); 
+extern uint8_t sfx_play_bank; 
+extern const uint8_t * sfx_play_sample;
+
+inline void sfx_set_sample(uint8_t bank, const uint8_t * sample) CRITICAL {
+    sfx_play_bank = bank, sfx_play_sample = sample;
+}
 uint8_t sfx_play_isr() OLDCALL;
 
 #endif

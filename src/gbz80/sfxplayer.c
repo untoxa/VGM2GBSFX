@@ -84,7 +84,3 @@ lbl:
         ret
 __endasm;
 }
-
-void sfx_set_sample(uint8_t bank, const uint8_t * sample) CRITICAL {
-    sfx_play_bank = bank, sfx_play_sample = sample;
-}
