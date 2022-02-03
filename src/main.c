@@ -35,10 +35,10 @@ void main() {
         uint8_t joy = joypad();
         if (joy & J_A)      music_load(BANK(music_track_0__Data), &music_track_0__Data), music_pause(music_paused = FALSE);
         if (joy & J_B)      music_load(BANK(music_track_1__Data), &music_track_1__Data), music_pause(music_paused = FALSE);
-        if (joy & J_UP)     sound_mask |= MUTE_MASK_sfx_00,   sfx_set_sample(BANK(sfx_00), sfx_00);
-        if (joy & J_DOWN)   sound_mask |= MUTE_MASK_sfx_00_2, sfx_set_sample(BANK(sfx_00_2), sfx_00_2);
-        if (joy & J_LEFT)   sound_mask |= 0b00000100,         sfx_set_sample(BANK(icq_message), icq_message);
-        if (joy & J_RIGHT)  sound_mask |= 0b00000100,         sfx_set_sample(BANK(quang2), quang2);
+        if (joy & J_UP)     music_mute_mask |= MUTE_MASK_sfx_00,   sfx_set_sample(BANK(sfx_00), sfx_00);
+        if (joy & J_DOWN)   music_mute_mask |= MUTE_MASK_sfx_00_2, sfx_set_sample(BANK(sfx_00_2), sfx_00_2);
+        if (joy & J_LEFT)   music_mute_mask |= 0b00000100,         sfx_set_sample(BANK(icq_message), icq_message);
+        if (joy & J_RIGHT)  music_mute_mask |= 0b00000100,         sfx_set_sample(BANK(quang2), quang2);
         if (joy & J_SELECT) music_stop(), music_pause(music_paused = FALSE);
         if (joy & J_START)  music_pause(music_paused = (!music_paused));
         if (joy) waitpadup();

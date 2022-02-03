@@ -6,10 +6,9 @@
 #define MUSIC_STOP_BANK 0xffu
 //#define FORCE_CUT_SFX                                   // don't cut by default 
 
-extern uint8_t current_track_bank;
-extern uint8_t mute_flag, sound_mask;
-extern const hUGESong_t * next_track;
-extern uint8_t play_isr_pause;
+extern uint8_t music_current_track_bank;
+extern uint8_t music_mute_mask;
+extern const hUGESong_t * music_next_track;
 
 inline void sound_init() {
     NR52_REG = 0x80, NR51_REG = 0xFF, NR50_REG = 0x77;  // enable sound
@@ -22,11 +21,11 @@ inline void sound_cut() {
 void music_play_isr();
 
 inline void music_load(uint8_t bank, const hUGESong_t * data) CRITICAL {
-    next_track = data; current_track_bank = bank;
+    music_next_track = data; music_current_track_bank = bank;
 }
 void music_pause(uint8_t pause);
 inline void music_stop() {
-    current_track_bank = MUSIC_STOP_BANK, sound_cut();
+    music_current_track_bank = MUSIC_STOP_BANK, sound_cut();
 }
 
 #endif
