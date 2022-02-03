@@ -12,7 +12,7 @@ def main(argv=None):
     parser.add_option("-o", '--out',        dest='outfilename',                                      help='output file name')
     parser.add_option("-i", '--identifier', dest='identifier',                                       help='source identifier')
 
-    parser.add_option("-f", '--format',     dest='format',      default="C",                         help='format: C or ASM')
+    parser.add_option("-b", '--bank',       dest='bank',        default="255",                       help='BANK number (default AUTO=255)')    
 
     (options, args) = parser.parse_args()
 
@@ -33,22 +33,15 @@ def main(argv=None):
     else: 
         identifier = options.identifier
 
-    if (options.format == "C"):
-        sHDR    = ("#pragma bank 255\n\n"
-                   "#include <gbdk/platform.h>\n"
-                   "#include <stdint.h>\n\n"
-                   "BANKREF({0:s})\n"
-                   "const UINT8 {0:s}[] = {{\n")
-        sFOOT   = "1,0b{:08b}\n}};\n"
-        sEMIT   = "0x{:x}"
-        sNEW    = ",\n"
-        sNONEW  = ","
-    elif (fmt == "ASM"):
-        sHDR    = "{:s}::"
-        sFOOT   = "1,%{:08b}"
-        sEMIT   = "${:x}"
-        sNEW    = "\n"
-        sNONEW  = ","
+    sHDR    = ("#pragma bank {1:s}\n\n"
+               "#include <gbdk/platform.h>\n"
+               "#include <stdint.h>\n\n"
+               "BANKREF({0:s})\n"
+               "const UINT8 {0:s}[] = {{\n")
+    sFOOT   = "1,0b{:08b}\n}};\n"
+    sEMIT   = "0x{:x}"
+    sNEW    = ",\n"
+    sNONEW  = ","
 
     with wave.open(str(infilename), mode="rb") as f:
         p = f.getparams()
@@ -60,7 +53,7 @@ def main(argv=None):
 
             # output C source file
             with open(str(outfilename), "wb") as outf:                
-                outf.write(bytes(sHDR.format(identifier), "ascii"))
+                outf.write(bytes(sHDR.format(identifier, options.bank), "ascii"))
                 result = ""
                 for i in range(len(data) - len(data) % 32):
                     c = ((c << 4) | (data[i] >> 4)) & 0xFF

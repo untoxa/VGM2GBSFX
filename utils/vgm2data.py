@@ -22,6 +22,7 @@ def main(argv=None):
     parser.add_option("-w", "--no-wave",    dest="no_wave",     action="store_true",  default=False, help='disable waveform loading')
 
     parser.add_option("-d", "--delay",      dest='delay',                             default=0,     help='delay size')
+    parser.add_option("-b", '--bank',       dest='bank',        default="255",                       help='BANK number (default AUTO=255)')    
 
     (options, args) = parser.parse_args()
 
@@ -71,11 +72,11 @@ def main(argv=None):
             offset = unpack('<I', inf.read(4))[0]
             inf.seek(offset - 4, 1)
 
-            outf.write(bytes(("#pragma bank 255\n\n"
+            outf.write(bytes(("#pragma bank {1:s}\n\n"
                               "#include <gbdk/platform.h>\n"
                               "#include <stdint.h>\n\n"
                               "BANKREF({0:s})\n"
-                              "const uint8_t {0:s}[] = {{\n").format(identifier), "ascii"))
+                              "const uint8_t {0:s}[] = {{\n").format(identifier, options.bank), "ascii"))
 
             row = {}
             data = inf.read(1)
