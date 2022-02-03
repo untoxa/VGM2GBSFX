@@ -17,7 +17,7 @@ void music_play_isr() NONBANKED {
         hUGE_mute_mask = music_mute_mask, music_mute_flag = TRUE; 
     } else {
         if (music_mute_flag) {
-            hUGE_mute_mask = 0, hUGE_current_wave = 255, music_mute_flag = FALSE;
+            hUGE_mute_mask = 0, hUGE_reset_wave(), music_mute_flag = FALSE;
             #ifdef FORCE_CUT_SFX
             if (music_mute_mask & 1) NR12_REG = 0, NR14_REG = 0b11000000; 
             if (music_mute_mask & 2) NR22_REG = 0, NR24_REG = 0b11000000; 
