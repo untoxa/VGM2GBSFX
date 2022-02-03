@@ -32,7 +32,7 @@ lbl:
         ld a, (hl+)
         or a
         ld d, a                     ; d = frame channel count
-        jr z, 6$
+        jp z, 6$
 2$:
         ld a, (hl+)
         ld b, a                     ; a = b = channel no + register mask
@@ -40,7 +40,11 @@ lbl:
         and #0b00000111
         cp #5
         jr c, 3$
-        jr nz, 5$                   ; terminator
+        cp #7
+        jr z, 5$                    ; terminator
+
+        xor a
+        ld (_NR30_REG), a
 
         ld c, #__AUD3WAVERAM
         .rept 16
@@ -48,8 +52,29 @@ lbl:
             ldh (c), a
             inc c
         .endm
+
+        ld a, b
+        cp #6
+        jr nz, 4$               ; just load waveform, not play
+
+        ld a, #0x80             ; retrigger wave channel
+        ldh (_NR30_REG),a
+        xor a
+        ld (_NR30_REG), a
+
+        ld a, #0x80             
+        ldh (_NR30_REG),a
+        ld a, #0xFE             ; length of wave
+        ldh (_NR31_REG),a
+        ld a, #0x20             ; volume
+        ldh (_NR32_REG),a
+        xor a                   ; low freq bits are zero
+        ldh (_NR33_REG),a
+        ld a, #0xC7             ; start; no loop; high freq bits are 111
+        ldh (_NR34_REG),a       
+
         jr 4$
-5$:
+5$:                                 ; terminator
         ld hl, #0
         ld d, l
         jr 0$
@@ -67,7 +92,7 @@ lbl:
 
 4$:
         dec d
-        jr nz, 2$
+        jp nz, 2$
 6$:
         inc d                       ; return 1 if still playing
 0$:

@@ -37,11 +37,12 @@ BINDIR      = build/$(EXT)
 MKDIRS      = $(OBJDIR) $(BINDIR) # See bottom of Makefile for directory auto-creation
 
 BINS	    = $(OBJDIR)/$(PROJECTNAME).$(EXT)
-RSOURCES    = $(foreach dir,$(RESDIR),$(notdir $(wildcard $(dir)/*.vgm))) 
+VGM_RES    = $(foreach dir,$(RESDIR),$(notdir $(wildcard $(dir)/*.vgm))) 
+WAV_RES    = $(foreach dir,$(RESDIR),$(notdir $(wildcard $(dir)/*.wav))) 
 CSOURCES    = $(foreach dir,$(SRCDIR),$(notdir $(wildcard $(dir)/*.c))) $(foreach dir,$(SRCPLAT),$(notdir $(wildcard $(dir)/*.c))) $(foreach dir,$(RESDIR),$(notdir $(wildcard $(dir)/*.c)))
 ASMSOURCES  = $(foreach dir,$(SRCDIR),$(notdir $(wildcard $(dir)/*.s))) $(foreach dir,$(SRCPLAT),$(notdir $(wildcard $(dir)/*.s)))
-OBJS        = $(CSOURCES:%.c=$(OBJDIR)/%.o) $(ASMSOURCES:%.s=$(OBJDIR)/%.o) $(RSOURCES:%.vgm=$(OBJDIR)/%.o)
-RESOBJ      = $(RSOURCES:%.vgm=$(OBJDIR)/%.o)
+OBJS        = $(CSOURCES:%.c=$(OBJDIR)/%.o) $(ASMSOURCES:%.s=$(OBJDIR)/%.o) $(VGM_RES:%.vgm=$(OBJDIR)/%.o) $(WAV_RES:%.wav=$(OBJDIR)/%.o)
+RESOBJ      = $(VGM_RES:%.vgm=$(OBJDIR)/%.o) $(WAV_RES:%.wav=$(OBJDIR)/%.o)
 
 DEPENDANT   = $(CSOURCES:%.c=$(OBJDIR)/%.o)
 
@@ -54,7 +55,10 @@ DEPS = $(DEPENDANT:%.o=%.d)
 -include $(DEPS)
 
 $(OBJDIR)/%.c:	$(RESDIR)/%.vgm
-	python utils/vgm2data.py -v $< -o $@ -5 -w -3
+	python utils/vgm2data.py -v $< -o $@ -5 -w -3 -d 4
+
+$(OBJDIR)/%.c:	$(RESDIR)/%.wav
+	python utils/wav2data.py -w $< -o $@
 
 $(OBJDIR)/%.o:	$(OBJDIR)/%.c
 	$(LCC) $(CFLAGS) -c -o $@ $<

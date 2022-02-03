@@ -11,6 +11,9 @@
 #include "sfx_00.h"         // generated from VGM
 #include "sfx_00_2.h"       // generated from VGM
 
+#include "icq_message.h"    // generated from WAV
+#include "quang2.h"         // generated from WAV
+
 // #define FORCE_CUT_SFX    // don't cut by default 
 
 void hUGETrackerRoutine(unsigned char ch, unsigned char param, unsigned char tick) NONBANKED {
@@ -20,7 +23,8 @@ void hUGETrackerRoutine(unsigned char ch, unsigned char param, unsigned char tic
 uint8_t current_track_bank = 255;
 uint8_t mute_flag = 0, sound_mask = 0;
 const hUGESong_t * next_track;
-void play_music() NONBANKED {
+uint8_t play_isr_counter = 0;
+void play_isr() NONBANKED {
     if (sfx_play_isr()) {
         hUGE_mute_mask = sound_mask, mute_flag = TRUE; 
     } else {
@@ -31,10 +35,13 @@ void play_music() NONBANKED {
             if (sound_mask & 2) NR22_REG = 0, NR24_REG = 0b11000000; 
             if (sound_mask & 4) NR32_REG = 0; 
             if (sound_mask & 8) NR42_REG = 0, NR44_REG = 0b11000000;
-            #endif 
+            #endif
+            sound_mask = 0; 
         }
     }
     if (current_track_bank == 255) return;
+    play_isr_counter++;
+    if (play_isr_counter &= 3) return;
     uint8_t save_bank = _current_bank;
     SWITCH_ROM(current_track_bank);
     if (next_track) {
@@ -53,10 +60,12 @@ void main() {
     NR52_REG = 0x80, NR51_REG = 0xFF, NR50_REG = 0x77; // enable sound
     
     CRITICAL {
-        add_VBL(play_music);
+        TMA_REG = 0xC0u, TAC_REG = 0x07u;
+        add_TIM(play_isr);    
+        set_interrupts(VBL_IFLAG | TIM_IFLAG);
     }
 
-    puts("A    - module 1\nB    - module 2\nUP   - sound 1\nDOWN - sound 2");
+    puts("A    - module 1\nB    - module 2\nUP   - sound 1\nDOWN - sound 2\nLEFT - WAVE 1\nRIGHT- WAVE 2");
 
     while (TRUE) {
         uint8_t joy = joypad();
@@ -69,12 +78,22 @@ void main() {
             waitpadup();
         }
         if (joy & J_UP) {
-            sound_mask = MUTE_MASK_sfx_00;
+            sound_mask |= MUTE_MASK_sfx_00;
             sfx_set_sample(BANK(sfx_00), sfx_00);
         }
         if (joy & J_DOWN) {
-            sound_mask = MUTE_MASK_sfx_00_2;
+            sound_mask |= MUTE_MASK_sfx_00_2;
             sfx_set_sample(BANK(sfx_00_2), sfx_00_2);
+        }
+        if (joy & J_LEFT) {
+            sound_mask |= 0b00000100;
+            sfx_set_sample(BANK(icq_message), icq_message);
+            waitpadup();
+        }
+        if (joy & J_RIGHT) {
+            sound_mask |= 0b00000100;
+            sfx_set_sample(BANK(quang2), quang2);
+            waitpadup();
         }
         wait_vbl_done();
     }

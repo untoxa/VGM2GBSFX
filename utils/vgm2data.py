@@ -9,16 +9,19 @@ def main(argv=None):
     required_options = "infilename".split()
 
     parser = OptionParser()
-    parser.add_option("-v", '--VGM', dest='infilename', help='input file name')
-    parser.add_option("-o", '--out', dest='outfilename', help='output file name')
-    parser.add_option("-i", '--ident', dest='identifier', help='C source identifier')
+    parser.add_option("-v", '--VGM',        dest='infilename',                                       help='input file name')
+    parser.add_option("-o", '--out',        dest='outfilename',                                      help='output file name')
+    parser.add_option("-i", '--identifier', dest='identifier',                                       help='C source identifier')
 
-    parser.add_option("-1", "--no-nr1x", action="store_true", dest="no_nr1x", default=False, help='disable channel 0')
-    parser.add_option("-2", "--no-nr2x", action="store_true", dest="no_nr2x", default=False, help='disable channel 1')
-    parser.add_option("-3", "--no-nr3x", action="store_true", dest="no_nr3x", default=False, help='disable channel 2')
-    parser.add_option("-4", "--no-nr4x", action="store_true", dest="no_nr4x", default=False, help='disable channel 3')
-    parser.add_option("-5", "--no-nr5x", action="store_true", dest="no_nr5x", default=False, help='disable sound init')
-    parser.add_option("-w", "--no-wave", action="store_true", dest="no_wave", default=False, help='disable waveform loading')
+    parser.add_option("-1", "--no-nr1x",    dest="no_nr1x",     action="store_true",  default=False, help='disable channel 0')
+    parser.add_option("-2", "--no-nr2x",    dest="no_nr2x",     action="store_true",  default=False, help='disable channel 1')
+    parser.add_option("-3", "--no-nr3x",    dest="no_nr3x",     action="store_true",  default=False, help='disable channel 2')
+    parser.add_option("-4", "--no-nr4x",    dest="no_nr4x",     action="store_true",  default=False, help='disable channel 3')
+    parser.add_option("-5", "--no-nr5x",    dest="no_nr5x",     action="store_true",  default=False, help='disable NR5X manipulation')
+    parser.add_option("-s", "--no-init",    dest="no_init",     action="store_true",  default=False, help='disable sound init')
+    parser.add_option("-w", "--no-wave",    dest="no_wave",     action="store_true",  default=False, help='disable waveform loading')
+
+    parser.add_option("-d", "--delay",      dest='delay',                             default=0,     help='delay size')
 
     (options, args) = parser.parse_args()
 
@@ -78,7 +81,7 @@ def main(argv=None):
             data = inf.read(1)
             while (data):
                 if data == b'\x66':
-                    outf.write(bytes("1,0b{:08b}\n}};\n".format(6), "ascii"))
+                    outf.write(bytes("1,0b{:08b}\n}};\n".format(7), "ascii"))
                     break;
                 elif data == b'\xb3':
                     data = unpack('BB', inf.read(2))
@@ -111,7 +114,7 @@ def main(argv=None):
                     ch = row.pop(4, None)
                     if (ch) and (not options.no_nr5x):
                         val = ch.pop(3, -1)
-                        if (val != -1):
+                        if (val != -1) and (not options.no_init):
                             count += 1
                             result = "{}0b{:08b},0x{:02x},".format(result, 0b00100100, val)
                         mask = 4
@@ -153,8 +156,13 @@ def main(argv=None):
                                 channel_mute_mask |= (1 << j)
 
                     # output result
-                    result = "{},{}\n".format(count, result)
+                    result = "{},{}".format(count, result)
                     outf.write(bytes(result, "ascii"))
+
+                    # write additional delays
+                    for i in range(0, max(0, int(options.delay) - 1)):
+                        outf.write(b"0,")
+                    outf.write(b"\n")
 
                     # reset row
                     row = {}
