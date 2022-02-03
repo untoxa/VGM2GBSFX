@@ -40,7 +40,6 @@ inline void music_sound_cut_mask(uint8_t mask) {
     if (mask & MUSIC_CH_4) NR42_REG = 0, NR44_REG = MUSIC_CH_RETRIGGER;
 }
 
-
 void music_play_isr();
 
 inline void music_load(uint8_t bank, const hUGESong_t * data) CRITICAL {
