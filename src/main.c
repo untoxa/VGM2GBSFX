@@ -20,11 +20,11 @@ void hUGETrackerRoutine(unsigned char ch, unsigned char param, unsigned char tic
 void main() {
     static uint8_t music_paused = FALSE;
 
-    sound_init();
+    music_init();
     
     CRITICAL {
-        TMA_REG = 0xC0u, TAC_REG = 0x07u;
-        add_TIM(music_play_isr);    
+        music_setup_timer();
+        add_low_priority_TIM(music_play_isr);    
     }
     set_interrupts(VBL_IFLAG | TIM_IFLAG);
 

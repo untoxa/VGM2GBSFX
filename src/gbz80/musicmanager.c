@@ -19,10 +19,7 @@ void music_play_isr() NONBANKED {
         if (music_mute_flag) {
             hUGE_mute_mask = 0, hUGE_reset_wave(), music_mute_flag = FALSE;
             #ifdef FORCE_CUT_SFX
-            if (music_mute_mask & 1) NR12_REG = 0, NR14_REG = 0b11000000; 
-            if (music_mute_mask & 2) NR22_REG = 0, NR24_REG = 0b11000000; 
-            if (music_mute_mask & 4) NR32_REG = 0; 
-            if (music_mute_mask & 8) NR42_REG = 0, NR44_REG = 0b11000000;
+            music_sound_cut_mask(music_mute_mask);
             #endif
             music_mute_mask = 0; 
         }
@@ -33,7 +30,7 @@ void music_play_isr() NONBANKED {
     uint8_t save_bank = _current_bank;
     SWITCH_ROM(music_current_track_bank);
     if (music_next_track) {
-        sound_cut();
+        music_sound_cut();
         hUGE_init(music_next_track);
         music_next_track = 0;
     } else hUGE_dosound();
@@ -41,5 +38,5 @@ void music_play_isr() NONBANKED {
 }
 
 void music_pause(uint8_t pause) {
-    if (music_play_isr_pause = pause) sound_cut();
+    if (music_play_isr_pause = pause) music_sound_cut();
 }
