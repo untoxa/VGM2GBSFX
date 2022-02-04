@@ -21,7 +21,7 @@ def main(argv=None):
     parser.add_option("-s", "--no-init",    dest="no_init",     action="store_true",  default=False, help='disable sound init')
     parser.add_option("-w", "--no-wave",    dest="no_wave",     action="store_true",  default=False, help='disable waveform loading')
 
-    parser.add_option("-d", "--delay",      dest='delay',                             default=0,     help='delay size')
+    parser.add_option("-d", "--delay",      dest='delay',                             default=1,     help='delay size')
     parser.add_option("-b", '--bank',       dest='bank',        default="255",                       help='BANK number (default AUTO=255)')    
 
     (options, args) = parser.parse_args()
@@ -156,14 +156,12 @@ def main(argv=None):
                                 result = "{}0b{:08b},{}".format(result, mask, tmp)
                                 channel_mute_mask |= (1 << j)
 
-                    # output result
-                    result = "{},{}".format(count, result)
-                    outf.write(bytes(result, "ascii"))
+                    # optional delay
+                    count |= max(0, int(options.delay) - 1) << 4
 
-                    # write additional delays
-                    for i in range(0, max(0, int(options.delay) - 1)):
-                        outf.write(b"0,")
-                    outf.write(b"\n")
+                    # output result
+                    result = "0x{:02X},{}\n".format(count, result)
+                    outf.write(bytes(result, "ascii"))
 
                     # reset row
                     row = {}

@@ -1,9 +1,12 @@
 #include <gbdk/platform.h>
 #include <stdint.h>
 
-uint8_t sfx_play_bank;
+#include "sfxplayer.h"
+
+uint8_t sfx_play_bank = SFX_STOP_BANK;
 const uint8_t * sfx_play_sample = 0;
 uint16_t sfx_frame_count = 0;
+uint8_t sfx_frame_skip;
 
 uint8_t sfx_play_isr() NONBANKED NAKED OLDCALL {
 __asm
@@ -21,16 +24,36 @@ lbl:
         ld e, a
         or (hl)
         ret z
-        ld h, (hl)
+        ld d, (hl)
+
+        ld hl, #_sfx_frame_skip
+        xor a
+        or (hl)
+        jr z, 7$
+        dec (hl)
+8$:
+        ld e, a
+        ret
+7$:
+        ld h, d
         ld l, e                     ; HL = current position inside the sample
 
-        ld a, (#__current_bank)     ; save bank and switch
+        ld a, (__current_bank)      ; save bank and switch
         ld e, a
-        ld a, (#_sfx_play_bank)
+        ld a, (_sfx_play_bank)
+        inc a                       ; SFX_STOP_BANK ?
+        jr z, 8$
+        dec a
         ld (_rROMB0), a
 
+        ld d, #0x0f
+        ld a, (hl)
+        swap a
+        and d
+        ld (_sfx_frame_skip), a
+
         ld a, (hl+)
-        or a
+        and d
         ld d, a                     ; d = frame channel count
         jp z, 6$
 2$:
@@ -98,9 +121,9 @@ lbl:
         inc d                       ; return 1 if still playing
 0$:
         ld a, l                     ; save current position
-        ld (#_sfx_play_sample), a
+        ld (_sfx_play_sample), a
         ld a, h
-        ld (#_sfx_play_sample + 1), a
+        ld (_sfx_play_sample + 1), a
 
         ld a, e                     ; restore bank
         ld (_rROMB0), a
