@@ -85,24 +85,24 @@ def main(argv=None):
                     outf.write(bytes("1,0b{:08b}\n}};\n".format(7), "ascii"))
                     break;
                 elif data == b'\xb3':
-                    data = unpack('BB', inf.read(2))
-                    addr = data[0] + 0x10
+                    addr, data = unpack('BB', inf.read(2))
+                    addr += 0x10
                     if addr in range(0x10, 0x16):
-                        row.setdefault(0, {})[addr-0x10]=data[1]
+                        row.setdefault(0, {})[addr-0x10]=data
                     elif addr in range(0x16, 0x20):
-                        row.setdefault(1, {})[addr-0x15]=data[1]
+                        row.setdefault(1, {})[addr-0x15]=data
                     elif addr in range(0x1A, 0x1F):
-                        row.setdefault(2, {})[addr-0x1A]=data[1]
+                        row.setdefault(2, {})[addr-0x1A]=data
                     elif addr in range(0x20, 0x24):
-                        row.setdefault(3, {})[addr-0x1F]=data[1]
+                        row.setdefault(3, {})[addr-0x1F]=data
                     elif addr in range(0x24, 0x27):
-                        row.setdefault(4, {})[addr-0x24]=data[1]
+                        row.setdefault(4, {})[addr-0x24]=data
                     elif addr in range(0x30, 0x40):
-                        row.setdefault(5, {})[addr-0x30]=data[1]
+                        row.setdefault(5, {})[addr-0x30]=data
                     else:
                         print("ERROR: Invalid register address: 0x{:02X}".format(addr))
                         sys.exit(1)
-                    value = data[1]
+                    value = data
                 elif data == b'\x62':            
                     if (not row.setdefault(0, {}).setdefault(4, None)):
                         row.pop(0, None)
