@@ -68,6 +68,7 @@ def main(argv=None):
                             result += sNONEW
                     flag = not flag
                 outf.write(bytes(sFOOT.format(7), "ascii"))
+                outf.write(bytes("void AT(0b{1:08b}) __mute_mask_{0:s};".format(identifier, 4),"ascii"))
         else:
             print("ERROR: Invalif wav file format")
             sys.exit(1)
@@ -81,7 +82,8 @@ def main(argv=None):
                                   "#include <stdint.h>\n\n"
                                   "#define MUTE_MASK_{0:s} 0b{1:08b}\n\n"
                                   "BANKREF_EXTERN({0:s})\n"
-                                  "extern const uint8_t {0:s}[];\n\n"
+                                  "extern const uint8_t {0:s}[];\n"
+                                  "extern void __mute_mask_{0:s};\n\n"
                                   "#endif\n").format(identifier, 4), "ascii"))
 
 if __name__=='__main__':

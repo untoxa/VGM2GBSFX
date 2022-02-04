@@ -170,6 +170,8 @@ def main(argv=None):
                     print("ERROR: unsupported command 0x{:02X}".format(unpack('B', data)[0]))
                     sys.exit(1)
                 data = inf.read(1)
+                
+            outf.write(bytes("void AT(0b{1:08b}) __mute_mask_{0:s};".format(identifier, channel_mute_mask), "ascii"))
 
         # output C header file
         if outfilename.suffix == ".c":
@@ -180,7 +182,8 @@ def main(argv=None):
                                   "#include <stdint.h>\n\n"
                                   "#define MUTE_MASK_{0:s} 0b{1:08b}\n\n"
                                   "BANKREF_EXTERN({0:s})\n"
-                                  "extern const uint8_t {0:s}[];\n\n"
+                                  "extern const uint8_t {0:s}[];\n"
+                                  "extern void __mute_mask_{0:s};\n\n"
                                   "#endif\n").format(identifier, channel_mute_mask), "ascii"))
         
 if __name__=='__main__':

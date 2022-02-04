@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #define SFX_STOP_BANK 0xffu
+#define MUTE_MASK(VARNAME) ( (uint8_t) & __mute_mask_ ## VARNAME )
 
 extern uint8_t sfx_play_bank; 
 extern const uint8_t * sfx_play_sample;
