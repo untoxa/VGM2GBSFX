@@ -63,11 +63,22 @@ def main(argv=None):
                
     with open(str(infilename), "rb") as inf:
         channel_mute_mask = 0
+
+        # check VGM format
+        if inf.read(4) != b'Vgm ':
+            print("invalid file format")
+            sys.exit(1)
+        inf.seek(0x08)
+        if (unpack('<I', inf.read(4))[0] < 0x161):
+            print("VGM version too low")
+            sys.exit(1)
+        inf.seek(0x80)
+        if (unpack('<I', inf.read(4))[0] == 0):
+            print("VGM must contain GameBoy data")
+            sys.exit(1)
+            
         # output C source file
         with open(str(outfilename), "wb") as outf:                
-            if inf.read(4) != b'Vgm ':
-                print("invalid file format")
-                sys.exit(1)
             inf.seek(0x34)
             offset = unpack('<I', inf.read(4))[0]
             inf.seek(offset - 4, 1)
