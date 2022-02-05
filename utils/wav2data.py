@@ -70,7 +70,7 @@ def main(argv=None):
                 outf.write(bytes(sFOOT.format(7), "ascii"))
                 outf.write(bytes("void AT(0b{1:08b}) __mute_mask_{0:s};".format(identifier, 4),"ascii"))
         else:
-            print("ERROR: Invalif wav file format")
+            print("ERROR: Invalid WAV file format")
             sys.exit(1)
 
         # output C header file
