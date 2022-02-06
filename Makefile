@@ -55,10 +55,10 @@ DEPS = $(DEPENDANT:%.o=%.d)
 -include $(DEPS)
 
 $(OBJDIR)/%.c:	$(RESDIR)/%.vgm
-	python utils/vgm2data.py -v $< -o $@ -5 -w -3 -d 4
+	python utils/vgm2data.py -5 -w -3 -d 4 -o $@ $<
 
 $(OBJDIR)/%.c:	$(RESDIR)/%.wav
-	python utils/wav2data.py -w $< -o $@
+	python utils/wav2data.py -o $@ $<
 
 $(OBJDIR)/%.o:	$(OBJDIR)/%.c
 	$(LCC) $(CFLAGS) -c -o $@ $<

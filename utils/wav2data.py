@@ -5,10 +5,7 @@ from pathlib import Path
 from optparse import OptionParser
 
 def main(argv=None):
-    required_options = "infilename".split()
-
-    parser = OptionParser()
-    parser.add_option("-w", '--WAV',        dest='infilename',                                       help='input file name')
+    parser = OptionParser("Usage: wav2data.py [options] INPUT_FILE_NAME.WAV")
     parser.add_option("-o", '--out',        dest='outfilename',                                      help='output file name')
     parser.add_option("-i", '--identifier', dest='identifier',                                       help='source identifier')
 
@@ -16,12 +13,11 @@ def main(argv=None):
 
     (options, args) = parser.parse_args()
 
-    for r in required_options:
-        if options.__dict__[r] is None:
-            parser.print_help()
-            parser.error("parameter '{}' required".format(r))
+    if (len(args) == 0):
+        parser.print_help()
+        parser.error("Input file name required\n")
     
-    infilename = Path(options.infilename)
+    infilename = Path(args[0])
     
     if options.outfilename == None:
         outfilename = infilename.with_suffix('.c')
