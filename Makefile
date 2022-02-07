@@ -9,7 +9,10 @@ LCC = $(GBDK_HOME)bin/lcc
 # They can also be built/cleaned individually: "make gg" and "make gg-clean"
 # Possible are: gb gbc pocket sms gg
 #TARGETS=gb pocket sms gg
-TARGETS=gb
+TARGETS  = gb
+
+#VGMFLAGS=-5 -w -3 -d 4
+VGMFLAGS = -5 -d 4
 
 # Configure platform specific LCC flags here:
 LCCFLAGS_gb      = -Wl-yt0x19 -Wl-yo4 -Wm-yS -Wm-yn"$(PROJECTNAME)"
@@ -55,7 +58,7 @@ DEPS = $(DEPENDANT:%.o=%.d)
 -include $(DEPS)
 
 $(OBJDIR)/%.c:	$(RESDIR)/%.vgm
-	python utils/vgm2data.py -5 -w -3 -d 4 -o $@ $<
+	python utils/vgm2data.py $(VGMFLAGS) -o $@ $<
 
 $(OBJDIR)/%.c:	$(RESDIR)/%.wav
 	python utils/wav2data.py -o $@ $<

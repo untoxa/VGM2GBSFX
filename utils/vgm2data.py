@@ -110,10 +110,10 @@ def main(argv=None):
                         sys.exit(1)
                     value = data
                 elif data == b'\x62':            
-                    if (not row.setdefault(0, {}).setdefault(4, None)):
-                        row.pop(0, None)
-                    if (not row.setdefault(1, {}).setdefault(4, None)):
-                        row.pop(1, None)
+#                    if (not row.setdefault(0, {}).setdefault(4, None)):
+#                        row.pop(0, None)
+#                    if (not row.setdefault(1, {}).setdefault(4, None)):
+#                        row.pop(1, None)
                         
                     result = ""    
                     count = 0    
@@ -157,7 +157,7 @@ def main(argv=None):
                                 if (val != -1):
                                     mask |= 1 << (7 - i)
                                     tmp = "{}0x{:02x},".format(tmp, val)
-                            if (mask != j):
+                            if (mask != j) and ((mask & 0b00001000) != 0):
                                 count += 1
                                 result = "{}0b{:08b},{}".format(result, mask, tmp)
                                 channel_mute_mask |= (1 << j)
