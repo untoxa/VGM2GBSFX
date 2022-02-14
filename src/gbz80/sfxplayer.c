@@ -5,7 +5,6 @@
 
 uint8_t sfx_play_bank = SFX_STOP_BANK;
 const uint8_t * sfx_play_sample = 0;
-uint16_t sfx_frame_count = 0;
 uint8_t sfx_frame_skip;
 
 uint8_t sfx_play_isr() NONBANKED NAKED OLDCALL {
