@@ -33,7 +33,7 @@ def main(argv=None):
                "#include <gbdk/platform.h>\n"
                "#include <stdint.h>\n\n"
                "BANKREF({0:s})\n"
-               "const UINT8 {0:s}[] = {{\n")
+               "const uint8_t {0:s}[] = {{\n")
     sFOOT   = "1,0b{:08b}\n}};\n"
     sEMIT   = "0x{:x}"
     sNEW    = ",\n"

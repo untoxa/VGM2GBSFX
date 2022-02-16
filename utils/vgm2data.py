@@ -106,7 +106,7 @@ def main(argv=None):
                     elif addr in range(0x30, 0x40):
                         row.setdefault(5, {})[addr-0x30]=data
                     else:
-                        print("ERROR: Invalid register address: 0x{:02X}".format(addr))
+                        print("ERROR: Invalid register address: 0x{:02x}".format(addr))
                         sys.exit(1)
                     value = data
                 elif data == b'\x62':            
@@ -166,14 +166,14 @@ def main(argv=None):
                     count |= max(0, int(options.delay) - 1) << 4
 
                     # output result
-                    result = "0x{:02X},{}\n".format(count, result)
+                    result = "0x{:02x},{}\n".format(count, result)
                     outf.write(bytes(result, "ascii"))
 
                     # reset row
                     row = {}
                     pass
                 else:
-                    print("ERROR: unsupported command 0x{:02X}".format(unpack('B', data)[0]))
+                    print("ERROR: unsupported command 0x{:02x}".format(unpack('B', data)[0]))
                     sys.exit(1)
                 data = inf.read(1)
                 

@@ -13,6 +13,7 @@ TARGETS  = gb
 
 #VGMFLAGS=-5 -w -3 -d 4
 VGMFLAGS = -5 -d 4
+FXFLAGS = -d 4 -p -c
 
 # Configure platform specific LCC flags here:
 LCCFLAGS_gb      = -Wl-yt0x19 -Wl-yo4 -Wm-yS -Wm-yn"$(PROJECTNAME)"
@@ -40,12 +41,13 @@ BINDIR      = build/$(EXT)
 MKDIRS      = $(OBJDIR) $(BINDIR) # See bottom of Makefile for directory auto-creation
 
 BINS	    = $(OBJDIR)/$(PROJECTNAME).$(EXT)
-VGM_RES    = $(foreach dir,$(RESDIR),$(notdir $(wildcard $(dir)/*.vgm))) 
-WAV_RES    = $(foreach dir,$(RESDIR),$(notdir $(wildcard $(dir)/*.wav))) 
+VGM_RES     = $(foreach dir,$(RESDIR),$(notdir $(wildcard $(dir)/*.vgm))) 
+WAV_RES     = $(foreach dir,$(RESDIR),$(notdir $(wildcard $(dir)/*.wav))) 
+FX_RES	    = $(foreach dir,$(RESDIR),$(notdir $(wildcard $(dir)/*.sav))) 
 CSOURCES    = $(foreach dir,$(SRCDIR),$(notdir $(wildcard $(dir)/*.c))) $(foreach dir,$(SRCPLAT),$(notdir $(wildcard $(dir)/*.c))) $(foreach dir,$(RESDIR),$(notdir $(wildcard $(dir)/*.c)))
 ASMSOURCES  = $(foreach dir,$(SRCDIR),$(notdir $(wildcard $(dir)/*.s))) $(foreach dir,$(SRCPLAT),$(notdir $(wildcard $(dir)/*.s)))
-OBJS        = $(CSOURCES:%.c=$(OBJDIR)/%.o) $(ASMSOURCES:%.s=$(OBJDIR)/%.o) $(VGM_RES:%.vgm=$(OBJDIR)/%.o) $(WAV_RES:%.wav=$(OBJDIR)/%.o)
-RESOBJ      = $(VGM_RES:%.vgm=$(OBJDIR)/%.o) $(WAV_RES:%.wav=$(OBJDIR)/%.o)
+OBJS        = $(CSOURCES:%.c=$(OBJDIR)/%.o) $(ASMSOURCES:%.s=$(OBJDIR)/%.o)
+RESOBJ      = $(VGM_RES:%.vgm=$(OBJDIR)/%.o) $(WAV_RES:%.wav=$(OBJDIR)/%.o) $(FX_RES:%.sav=$(OBJDIR)/%.o)
 
 DEPENDANT   = $(CSOURCES:%.c=$(OBJDIR)/%.o)
 
@@ -62,6 +64,9 @@ $(OBJDIR)/%.c:	$(RESDIR)/%.vgm
 
 $(OBJDIR)/%.c:	$(RESDIR)/%.wav
 	python utils/wav2data.py -o $@ $<
+
+$(OBJDIR)/%.c:	$(RESDIR)/%.sav
+	python utils/fxhammer2data.py $(FXFLAGS) -o $@ $<
 
 $(OBJDIR)/%.o:	$(OBJDIR)/%.c
 	$(LCC) $(CFLAGS) -c -o $@ $<
@@ -88,7 +93,7 @@ $(OBJDIR)/%.o:	$(SRCDIR)/%.s
 
 # Link the compiled object files into a .gb ROM file
 $(BINS):	$(RESOBJ) $(OBJS)
-	$(LCC) $(LCCFLAGS) $(CFLAGS) -o $(BINDIR)/$(PROJECTNAME).$(EXT) $(OBJS)
+	$(LCC) $(LCCFLAGS) $(CFLAGS) -o $(BINDIR)/$(PROJECTNAME).$(EXT) $^
 
 clean:
 	@echo Cleaning
