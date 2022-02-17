@@ -2,7 +2,8 @@
 
 #include "hUGEDriver.h"
 #include <stddef.h>
-#include "hUGEDriverRoutines.h"
+
+extern const hUGERoutine_t routines[];
 
 static const unsigned char order_cnt = 20;
 static const unsigned char song_pattern_0[] = {

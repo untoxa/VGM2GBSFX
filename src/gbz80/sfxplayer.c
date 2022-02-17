@@ -3,8 +3,8 @@
 
 #include "sfxplayer.h"
 
-uint8_t sfx_play_bank = SFX_STOP_BANK;
-const uint8_t * sfx_play_sample = 0;
+volatile uint8_t sfx_play_bank = SFX_STOP_BANK;
+const uint8_t * sfx_play_sample = NULL;
 uint8_t sfx_frame_skip;
 
 uint8_t sfx_play_isr() NONBANKED NAKED OLDCALL {
