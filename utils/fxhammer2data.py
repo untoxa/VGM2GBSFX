@@ -12,6 +12,19 @@ note_freqs = [
     1985,1988,1992,1995,1998,2001,2004,2006,2009,2011,2013,2015
 ]
 
+def make_frame(ch, a, b, c, d, cache):
+    mask = 0b01001000 | ch
+    result = ",0x{:02x}".format(a)
+    if b != cache[0]:
+        mask |= 0b00100000
+        result = "{:s},0x{:02x}".format(result, b)
+        cache[0] = b
+    if c != cache[1]:
+        mask |= 0b00010000
+        result = "{:s},0x{:02x}".format(result, c)
+        cache[1] = c
+    return "0b{:08b}{:s},0x{:02x}".format(mask, result, d)    
+
 def write_effect_data(cfile, hfile, identifier, ch, data, options):
     global note_freqs
 
@@ -24,6 +37,8 @@ def write_effect_data(cfile, hfile, identifier, ch, data, options):
     cfile.write(bytes(("BANKREF({0:s})\n"
                        "const uint8_t {0:s}[] = {{\n").format(identifier), "ascii"))
 
+    ch2_cache = [-1,-1]
+    ch4_cache = [-1,-1]
     old_pan = 0xff
 
     for i in range(0, 32):
@@ -45,15 +60,21 @@ def write_effect_data(cfile, hfile, identifier, ch, data, options):
         if (ch2pan != 0):
             count += 1
             freq = note_freqs[(ch2note - 0x40) >> 1]
-            result = "{:s},0b{:08b},0x{:02x},0x{:02x},0x{:02x},0x{:02x}".format(
-                        result, 0b01111001, ch2duty, ch2vol, freq & 0xff, ((freq >> 8) | 0x80) & 0xff
-                     )
+            if options.optimize:
+                result = "{:s},{:s}".format(result, make_frame(1, ch2duty, ch2vol, freq & 0xff, ((freq >> 8) | 0x80) & 0xff, ch2_cache))
+            else:
+                result = "{:s},0b{:08b},0x{:02x},0x{:02x},0x{:02x},0x{:02x}".format(
+                            result, 0b01111001, ch2duty, ch2vol, freq & 0xff, ((freq >> 8) | 0x80) & 0xff
+                         )
 
         if (ch4pan != 0):
             count += 1
-            result = "{:s},0b{:08b},0x{:02x},0x{:02x},0x{:02x},0x{:02x}".format(
-                        result, 0b01111011, 0x2a, ch4vol, ch4freq, 0x80
-                     )
+            if options.optimize:
+                result = "{:s},{:s}".format(result, make_frame(3, 0x2a, ch4vol, ch4freq, 0x80, ch4_cache))
+            else:
+                result = "{:s},0b{:08b},0x{:02x},0x{:02x},0x{:02x},0x{:02x}".format(
+                            result, 0b01111011, 0x2a, ch4vol, ch4freq, 0x80
+                         )
 
         delay = max(0, (int(options.delay) * duration) - 1)
         delta = min(15, delay)
@@ -91,14 +112,15 @@ def write_effect_data(cfile, hfile, identifier, ch, data, options):
 
 def main(argv=None):
     parser = OptionParser("Usage: fxhammer2data.py [options] INPUT_FILE_NAME.SAV")
-    parser.add_option("-o", '--out',        dest='outfilename',                                       help='output file name')
-    parser.add_option("-i", '--identifier', dest='identifier',                                        help='source identifier')
-    parser.add_option("-n", '--number',     dest='effectnum',                         default="all",  help='effect number or "all"')
+    parser.add_option("-o", '--out',        dest='outfilename',                                        help='output file name')
+    parser.add_option("-i", '--identifier', dest='identifier',                                         help='source identifier')
+    parser.add_option("-n", '--number',     dest='effectnum',                          default="all",  help='effect number or "all"')
 
-    parser.add_option("-d", "--delay",      dest='delay',                             default=1,      help='delay size')
-    parser.add_option("-b", '--bank',       dest='bank',                              default="255",  help='BANK number (default AUTO=255)')    
-    parser.add_option("-c", "--cut",        dest="cut_sound",   action="store_true",  default=False,  help='cut all used sound channels at the end')
-    parser.add_option("-p", "--no-pan",     dest="use_pan",     action="store_false", default=True,   help='disable channel panning')
+    parser.add_option("-d", "--delay",      dest='delay',                              default=1,      help='delay size')
+    parser.add_option("-b", '--bank',       dest='bank',                               default="255",  help='BANK number (default AUTO=255)')    
+    parser.add_option("-c", "--cut",        dest="cut_sound",    action="store_true",  default=False,  help='cut all used sound channels at the end')
+    parser.add_option("-p", "--no-pan",     dest="use_pan",      action="store_false", default=True,   help='disable channel panning')
+    parser.add_option("-s", "--no-opt",     dest="optimize",     action="store_false", default=True,   help='disable optimization')
 
     (options, args) = parser.parse_args()
 
