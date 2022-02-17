@@ -13,7 +13,7 @@ TARGETS  = gb
 
 #VGMFLAGS=-5 -w -3 -d 4
 VGMFLAGS = -5 -d 4
-FXFLAGS = -d 4 -p -c
+FXFLAGS = -d 4 -c
 
 # Configure platform specific LCC flags here:
 LCCFLAGS_gb      = -Wl-yt0x19 -Wl-yo4 -Wm-yS -Wm-yn"$(PROJECTNAME)"

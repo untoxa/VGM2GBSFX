@@ -91,14 +91,14 @@ def write_effect_data(cfile, hfile, identifier, ch, data, options):
 
 def main(argv=None):
     parser = OptionParser("Usage: fxhammer2data.py [options] INPUT_FILE_NAME.SAV")
-    parser.add_option("-o", '--out',        dest='outfilename',                                      help='output file name')
-    parser.add_option("-i", '--identifier', dest='identifier',                                       help='source identifier')
-    parser.add_option("-n", '--number',     dest='effectnum',                        default="all",  help='effect number or "all"')
+    parser.add_option("-o", '--out',        dest='outfilename',                                       help='output file name')
+    parser.add_option("-i", '--identifier', dest='identifier',                                        help='source identifier')
+    parser.add_option("-n", '--number',     dest='effectnum',                         default="all",  help='effect number or "all"')
 
-    parser.add_option("-d", "--delay",      dest='delay',                            default=1,      help='delay size')
-    parser.add_option("-b", '--bank',       dest='bank',                             default="255",  help='BANK number (default AUTO=255)')    
-    parser.add_option("-c", "--cut",        dest="cut_sound",   action="store_true", default=False,  help='cut all sound channels')
-    parser.add_option("-p", "--pan",        dest="use_pan",     action="store_true", default=False,  help='emit channel panning')
+    parser.add_option("-d", "--delay",      dest='delay',                             default=1,      help='delay size')
+    parser.add_option("-b", '--bank',       dest='bank',                              default="255",  help='BANK number (default AUTO=255)')    
+    parser.add_option("-c", "--cut",        dest="cut_sound",   action="store_true",  default=False,  help='cut all used sound channels at the end')
+    parser.add_option("-p", "--no-pan",     dest="use_pan",     action="store_false", default=True,   help='disable channel panning')
 
     (options, args) = parser.parse_args()
 
