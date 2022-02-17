@@ -44,10 +44,11 @@ BINS	    = $(OBJDIR)/$(PROJECTNAME).$(EXT)
 VGM_RES     = $(foreach dir,$(RESDIR),$(notdir $(wildcard $(dir)/*.vgm))) 
 WAV_RES     = $(foreach dir,$(RESDIR),$(notdir $(wildcard $(dir)/*.wav))) 
 FX_RES	    = $(foreach dir,$(RESDIR),$(notdir $(wildcard $(dir)/*.sav))) 
+UGE_RES	    = $(foreach dir,$(RESDIR),$(notdir $(wildcard $(dir)/*.uge)))
 CSOURCES    = $(foreach dir,$(SRCDIR),$(notdir $(wildcard $(dir)/*.c))) $(foreach dir,$(SRCPLAT),$(notdir $(wildcard $(dir)/*.c))) $(foreach dir,$(RESDIR),$(notdir $(wildcard $(dir)/*.c)))
 ASMSOURCES  = $(foreach dir,$(SRCDIR),$(notdir $(wildcard $(dir)/*.s))) $(foreach dir,$(SRCPLAT),$(notdir $(wildcard $(dir)/*.s)))
 OBJS        = $(CSOURCES:%.c=$(OBJDIR)/%.o) $(ASMSOURCES:%.s=$(OBJDIR)/%.o)
-RESOBJ      = $(VGM_RES:%.vgm=$(OBJDIR)/%.o) $(WAV_RES:%.wav=$(OBJDIR)/%.o) $(FX_RES:%.sav=$(OBJDIR)/%.o)
+RESOBJ      = $(VGM_RES:%.vgm=$(OBJDIR)/%.o) $(WAV_RES:%.wav=$(OBJDIR)/%.o) $(FX_RES:%.sav=$(OBJDIR)/%.o) $(UGE_RES:%.uge=$(OBJDIR)/%.o)
 
 DEPENDANT   = $(CSOURCES:%.c=$(OBJDIR)/%.o)
 
@@ -67,6 +68,9 @@ $(OBJDIR)/%.c:	$(RESDIR)/%.wav
 
 $(OBJDIR)/%.c:	$(RESDIR)/%.sav
 	python utils/fxhammer2data.py $(FXFLAGS) -o $@ $<
+
+$(OBJDIR)/%.c:	$(RESDIR)/%.uge
+	utils/uge2source $< -b 255 $(basename $(notdir $<)) $@
 
 $(OBJDIR)/%.o:	$(OBJDIR)/%.c
 	$(LCC) $(CFLAGS) -c -o $@ $<
