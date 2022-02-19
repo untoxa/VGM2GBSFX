@@ -37,6 +37,10 @@ inline void sfx_sound_cut_mask(uint8_t mask) {
     NR51_REG = 0xFF;
 }
 
+inline void sfx_reset_sample() {
+    sfx_play_bank = SFX_STOP_BANK, sfx_play_sample = NULL;
+}
+
 inline void sfx_set_sample(uint8_t bank, const uint8_t * sample) {
     sfx_play_bank = SFX_STOP_BANK, sfx_frame_skip = 0, sfx_play_sample = sample, sfx_play_bank = bank;
 }

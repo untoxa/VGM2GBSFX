@@ -23,7 +23,10 @@ inline void music_setup_timer() {
 }
 
 inline void music_init() {
+    music_current_track_bank = MUSIC_STOP_BANK;
     sfx_sound_init();
+    sfx_reset_sample();
+    sfx_sound_cut();
 }
 
 inline void music_sound_cut() {
