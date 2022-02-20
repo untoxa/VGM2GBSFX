@@ -109,7 +109,7 @@ def main(argv=None):
                         print("ERROR: Invalid register address: 0x{:02x}".format(addr))
                         sys.exit(1)
                     value = data
-                elif data == b'\x61' or data == b'\x62' or (data >= b'\x70' and data <= b'\x7f'):
+                elif (data >= b'\x61' and data <= b'\x63') or (data >= b'\x70' and data <= b'\x7f'):
                     if data == b'\x61': 
                         inf.seek(2, 1)                  
                         
