@@ -81,14 +81,8 @@ lbl:
         cp #6
         jr nz, 4$                   ; just load waveform, not play
 
-        ld c, #_NR30_REG
-        ld a, #0x80                 ; retrigger wave channel
-        ldh (c),a
-        xor a
-        ldh (c), a
-
         ld a, #0x80             
-        ldh (c),a
+        ldh (_NR30_REG),a
         ld a, #0xFE                 ; length of wave
         ldh (_NR31_REG),a
         ld a, #0x20                 ; volume
