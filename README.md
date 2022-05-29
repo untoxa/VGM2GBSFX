@@ -24,7 +24,7 @@ on each call of sfx_play_isr() the next row of data is processed. if delay = N i
 
 `COMMAND: RRRRRCCC` 
 
-- `RRRRR` is a register bit mask, each bit represents the presense of a sound register in the packet MSB is the least address: `0b10000000` means load NR10 only. registers are loaded from lower to higher addresses.
+- `RRRRR` is a register bit mask, each bit represents the presence of a sound register in the packet MSB is the least address: `0b10000000` means load NR10 only. registers are loaded from lower to higher addresses.
 - `CCC` is a command:
 
   - `000` - load NR1X registers
