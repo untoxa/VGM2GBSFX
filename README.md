@@ -7,42 +7,44 @@ Convert DMG VGM files (and a few other formats) for using them as SFX in homebre
 4. wav2data.py is used to convert 8KHz mono PCM WAV files
 5. fxhammer2data.py is used to convert FXHammer https://www.pouet.net/prod.php?which=17337 (native game boy tool) sound effects in SAV format which is produced by almost any game boy emulator and is simply a SRAM dump
 
-Data format description:
+# Data format description:
 
-ROW: [COUNT][[[COMMAND][[REG]...]]...]
+`ROW: [COUNT][[[COMMAND][[REG]...]]...]`
 
-COUNT: DDDDCCCC 
+`COUNT: DDDDCCCC` 
 
-DDDD is a delay 
-CCCC is a data packet count
+- `DDDD` is a delay
+- `CCCC` is a data packet count
 
 on each call of sfx_play_isr() the next row of data is processed. if delay = N is specified, then N calls will be skipped before proceeding to the next row
 
-COMMAND: RRRRRCCC 
+`COMMAND: RRRRRCCC` 
 
-RRRRR is a register bit mask, each bit represents the presense of a sound register in the packet MSB is the least address: 0b10000000 means load NR10 only. registers are loaded from lower to higher addresses.
-CCC is a command:
+- `RRRRR` is a register bit mask, each bit represents the presense of a sound register in the packet MSB is the least address: `0b10000000` means load NR10 only. registers are loaded from lower to higher addresses.
+- `CCC` is a command:
 
-000 - load NR1X registers
-001 - load NR2X registers
-010 - load NR3X registers
-011 - load NR4X registers
-100 - load NR5X registers
-101 - load 16-byte wave sample
-110 - load 16-byte wave sample and play it
-111 - terminator  
+  - `000` - load NR1X registers
+  - `001` - load NR2X registers
+  - `010` - load NR3X registers
+  - `011` - load NR4X registers
+  - `100` - load NR5X registers
+  - `101` - load 16-byte wave sample (RRRRR bits are not used, always followed with 16 bytes of the waveform)
+  - `110` - load 16-byte wave sample and play it (RRRRR bits are not used, always followed with 16 bytes of the waveform)
+  - `111` - terminator  
 
-REG: 8-bit register value
+`REG: XXXXXXXX`
 
-EXAMPLE:
+- `XXXXXXXX` - 8-bit raw sound register value
 
-0x12,0b01111001,0x20,0xf8,0xc4,0x86,0b01111011,0x2a,0xf8,0x50,0x80,
+# EXAMPLE
+
+`0x12,0b01111001,0x20,0xf8,0xc4,0x86,0b01111011,0x2a,0xf8,0x50,0x80`
 
 two packets of data plus skip one next interrupt:
 channel 2: NR21 = 0x20, NR22 = 0xf8, NR23 = 0xc4, NR24 = 0x86
 channel 4: NR41 = 0x2a, NR42 = 0xf8, NR43 = 0x50, NR44 = 0x80
 
-0x02,0b01000100,0xff,0b00000111
+`0x02,0b01000100,0xff,0b00000111`
 
 two packets of data:
 NR5X: NR51 = 0xff (PAN: all channels centered)
