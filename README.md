@@ -41,11 +41,11 @@ on each call of sfx_play_isr() the next row of data is processed. if delay = N i
 `0x12,0b01111001,0x20,0xf8,0xc4,0x86,0b01111011,0x2a,0xf8,0x50,0x80`
 
 two packets of data plus skip one next interrupt:
-channel 2: NR21 = 0x20, NR22 = 0xf8, NR23 = 0xc4, NR24 = 0x86
-channel 4: NR41 = 0x2a, NR42 = 0xf8, NR43 = 0x50, NR44 = 0x80
+- channel 2: NR21 = 0x20, NR22 = 0xf8, NR23 = 0xc4, NR24 = 0x86
+- channel 4: NR41 = 0x2a, NR42 = 0xf8, NR43 = 0x50, NR44 = 0x80
 
 `0x02,0b01000100,0xff,0b00000111`
 
 two packets of data:
-NR5X: NR51 = 0xff (PAN: all channels centered)
-terminate sequence
+- NR5X: NR51 = 0xff (PAN: all channels centered)
+- terminate sequence
