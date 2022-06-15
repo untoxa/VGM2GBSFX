@@ -159,6 +159,7 @@ def main(argv=None):
                     elif addr in range(PCM_SAMPLE, PCM_SAMPLE + PCM_LENGTH):
                         row.setdefault(PCMDATA, {})[addr - PCM_SAMPLE] = data
                     else:
+                        print("ERROR: Invalid register address: 0x{:02x}".format(addr))
                         sys.exit(1)
                     value = data
                 elif (data == b'\x66') or (data >= b'\x61' and data <= b'\x63') or (data >= b'\x70' and data <= b'\x7f'):
