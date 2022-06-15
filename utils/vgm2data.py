@@ -4,29 +4,11 @@ from struct import unpack
 from pathlib import Path
 from optparse import OptionParser
 
-NR10_REG    = 0x10    # Sound register
-NR11_REG    = 0x11    # Sound register
-NR12_REG    = 0x12    # Sound register
-NR13_REG    = 0x13    # Sound register
-NR14_REG    = 0x14    # Sound register
-NR20_REG    = 0x15
-NR21_REG    = 0x16    # Sound register
-NR22_REG    = 0x17    # Sound register
-NR23_REG    = 0x18    # Sound register
-NR24_REG    = 0x19    # Sound register
-NR30_REG    = 0x1A    # Sound register
-NR31_REG    = 0x1B    # Sound register
-NR32_REG    = 0x1C    # Sound register
-NR33_REG    = 0x1D    # Sound register
-NR34_REG    = 0x1E    # Sound register
-NR40_REG    = 0x1F
-NR41_REG    = 0x20    # Sound register
-NR42_REG    = 0x21    # Sound register
-NR43_REG    = 0x22    # Sound register
-NR44_REG    = 0x23    # Sound register
-NR50_REG    = 0x24    # Sound register
-NR51_REG    = 0x25    # Sound register
-NR52_REG    = 0x26    # Sound register
+NR10_REG, NR11_REG, NR12_REG, NR13_REG, NR14_REG = 0x10, 0x11, 0x12, 0x13, 0x14 # NR1x
+NR20_REG, NR21_REG, NR22_REG, NR23_REG, NR24_REG = 0x15, 0x16, 0x17, 0x18, 0x19 # NR2x
+NR30_REG, NR31_REG, NR32_REG, NR33_REG, NR34_REG = 0x1A, 0x1B, 0x1C, 0x1D, 0x1E # NR3x
+NR40_REG, NR41_REG, NR42_REG, NR43_REG, NR44_REG = 0x1F, 0x20, 0x21, 0x22, 0x23 # NR4x
+NR50_REG, NR51_REG, NR52_REG = 0x24, 0x25, 0x26                                 # RE5x
 PCM_SAMPLE  = 0x30    # PCM wave pattern
 PCM_LENGTH  = 0x10    # PCM wave pattern
 
@@ -36,8 +18,10 @@ reg_names = {
     NR30_REG: "NR30_REG", NR31_REG: "NR31_REG", NR32_REG: "NR32_REG", NR33_REG: "NR33_REG", NR34_REG: "NR34_REG", 
                           NR41_REG: "NR41_REG", NR42_REG: "NR42_REG", NR43_REG: "NR43_REG", NR44_REG: "NR44_REG", 
     NR50_REG: "NR50_REG", NR51_REG: "NR51_REG", NR52_REG: "NR52_REG", 
-    0x30: "PCM[0]", 0x31: "PCM[1]", 0x32: "PCM[2]", 0x33: "PCM[3]", 0x34: "PCM[4]", 0x35: "PCM[5]", 0x36: "PCM[6]", 0x37: "PCM[7]", 
-    0x38: "PCM[8]", 0x39: "PCM[9]", 0x3A: "PCM[A]", 0x3B: "PCM[B]", 0x3C: "PCM[C]", 0x3D: "PCM[D]", 0x3E: "PCM[E]", 0x3F: "PCM[F]" 
+    PCM_SAMPLE +  0: "PCM[0]", PCM_SAMPLE +  1: "PCM[1]", PCM_SAMPLE +  2: "PCM[2]", PCM_SAMPLE +  3: "PCM[3]", 
+    PCM_SAMPLE +  4: "PCM[4]", PCM_SAMPLE +  5: "PCM[5]", PCM_SAMPLE +  6: "PCM[6]", PCM_SAMPLE +  7: "PCM[7]", 
+    PCM_SAMPLE +  8: "PCM[8]", PCM_SAMPLE +  9: "PCM[9]", PCM_SAMPLE + 10: "PCM[A]", PCM_SAMPLE + 11: "PCM[B]", 
+    PCM_SAMPLE + 12: "PCM[C]", PCM_SAMPLE + 13: "PCM[D]", PCM_SAMPLE + 14: "PCM[E]", PCM_SAMPLE + 25: "PCM[F]" 
 }
 
 NR1x, NR2x, NR3x, NR4x, NR5x, PCMDATA = 0, 1, 2, 3, 4, 5
