@@ -40,12 +40,7 @@ reg_names = {
     0x38: "PCM[8]", 0x39: "PCM[9]", 0x3A: "PCM[A]", 0x3B: "PCM[B]", 0x3C: "PCM[C]", 0x3D: "PCM[D]", 0x3E: "PCM[E]", 0x3F: "PCM[F]" 
 }
 
-NR1x = 0 
-NR2x = 1 
-NR3x = 2 
-NR4x = 3
-NR5x = 4
-PCMDATA = 5
+NR1x, NR2x, NR3x, NR4x, NR5x, PCMDATA = 0, 1, 2, 3, 4, 5
 
 chn_names = { NR1x: "NR1x", NR2x: "NR2x", NR3x: "NR3x", NR4x: "NR4x", NR5x: "NR5x", PCMDATA: "PCM" }
 
@@ -167,10 +162,6 @@ def main(argv=None):
                         inf.seek(2, 1)                  
                         
                     if (options.verbose): print("PACKET (resaon: {}): {}".format(hex(data[0]), row))
-#                    if (not row.setdefault(0, {}).setdefault(4, None)):
-#                        row.pop(0, None)
-#                    if (not row.setdefault(1, {}).setdefault(4, None)):
-#                        row.pop(1, None)
                         
                     result = ""
                     count = 0
