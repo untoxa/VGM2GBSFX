@@ -27,14 +27,14 @@ void main() {
     }
     set_interrupts(VBL_IFLAG | TIM_IFLAG);
 
-    puts("A     - module 1\nB     - module 2\nUP    - sound 1\nDOWN  - sound 2\nLEFT  - WAVE 1\nRIGHT - WAVE 2\nSELECT- music STOP\nSTART - music START");
+    puts("A     - module 1\nB     - module 2\nUP    - sound 1\nDOWN  - sound 2\nLEFT  - WAVE 1\nRIGHT - WAVE 2\nSELECT- music STOP\nSTART - music PAUSE");
 
     while (TRUE) {
         uint8_t joy = joypad();
         if (joy & J_A)      music_load(BANK(music_track_0__Data), &music_track_0__Data), music_pause(music_paused = FALSE);
         if (joy & J_B)      music_load(BANK(DEMOSONG), &DEMOSONG), music_pause(music_paused = FALSE);
-        if (joy & J_UP)     music_play_sfx(BANK(sound_effect1), sound_effect1, SFX_MUTE_MASK(sound_effect1), 1);
-//        if (joy & J_UP)     music_play_sfx(BANK(sound_effect3), sound_effect3, SFX_MUTE_MASK(sound_effect3), 1);
+//        if (joy & J_UP)     music_play_sfx(BANK(sound_effect1), sound_effect1, SFX_MUTE_MASK(sound_effect1), 1);
+        if (joy & J_UP)     music_play_sfx(BANK(sound_effect3), sound_effect3, SFX_MUTE_MASK(sound_effect3), 1);
         if (joy & J_DOWN)   music_play_sfx(BANK(hammered_01), hammered_01, SFX_MUTE_MASK(hammered_01), 1);
         if (joy & J_LEFT)   music_play_sfx(BANK(wave_icq_message), wave_icq_message, SFX_MUTE_MASK(wave_icq_message), 1);    
         if (joy & J_RIGHT)  music_play_sfx(BANK(wave_asobitech), wave_asobitech, SFX_MUTE_MASK(wave_asobitech), 1);

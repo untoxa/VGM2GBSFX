@@ -11,9 +11,7 @@ LCC = $(GBDK_HOME)bin/lcc
 #TARGETS=gb pocket sms gg
 TARGETS  = gb
 
-#VGMFLAGS=-5 -w -3 -d 4
-VGMFLAGS = -5 -d 4
-FXFLAGS = -d 4 -c
+CFLAGS   = 
 
 # Configure platform specific LCC flags here:
 LCCFLAGS_gb      = -Wl-yt0x19 -Wl-yo4 -Wm-yS -Wm-yn"$(PROJECTNAME)"
@@ -60,17 +58,21 @@ DEPS = $(DEPENDANT:%.o=%.d)
 
 -include $(DEPS)
 
-$(OBJDIR)/%.c:	$(RESDIR)/%.vgm
-	python utils/vgm2data.py $(VGMFLAGS) -o $@ $<
+.SECONDEXPANSION:
+$(OBJDIR)/%.c:	$(RESDIR)/%.vgm $$(wildcard $(RESDIR)/%.vgm.meta)
+	python utils/vgm2data.py `cat <$<.meta 2>/dev/null` -o $@ $<
 
-$(OBJDIR)/%.c:	$(RESDIR)/%.wav
-	python utils/wav2data.py -o $@ $<
+.SECONDEXPANSION:
+$(OBJDIR)/%.c:	$(RESDIR)/%.wav $$(wildcard $(RESDIR)/%.wav.meta)
+	python utils/wav2data.py `cat <$<.meta 2>/dev/null` -o $@ $<
 
-$(OBJDIR)/%.c:	$(RESDIR)/%.sav
-	python utils/fxhammer2data.py $(FXFLAGS) -o $@ $<
+.SECONDEXPANSION:
+$(OBJDIR)/%.c:	$(RESDIR)/%.sav $$(wildcard $(RESDIR)/%.sav.meta)
+	python utils/fxhammer2data.py `cat <$<.meta 2>/dev/null` -o $@ $<
 
-$(OBJDIR)/%.c:	$(RESDIR)/%.uge
-	utils/uge2source $< -b 255 $(basename $(notdir $<)) $@
+.SECONDEXPANSION:
+$(OBJDIR)/%.c:	$(RESDIR)/%.uge $$(wildcard $(RESDIR)/%.uge.meta)
+	utils/uge2source $< `cat <$<.meta 2>/dev/null` $(basename $(notdir $<)) $@
 
 $(OBJDIR)/%.o:	$(OBJDIR)/%.c
 	$(LCC) $(CFLAGS) -c -o $@ $<
