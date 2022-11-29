@@ -3,7 +3,7 @@ Convert DMG VGM files (and a few other formats) for using them as SFX in homebre
 
 ![example rom](/screenshot.png)
 
-Project requires GBDK-2020: http://gbdk-2020.github.io and GNU make. A few tools are compiled into executables for windows, but you may get the linux versions (or whatever else targets) from the original repositories. Main data conversion tools are written in python.
+Project requires GBDK-2020 v4.1.1: http://gbdk-2020.github.io and GNU make. A few tools are compiled into executables for windows, but you may get the linux versions (or whatever else targets) from the original repositories. Main data conversion tools are written in python.
 
 1. music in UGE format is made with hUGETracker (standalone, or embedded into GBStudio), those are converted into C source with uge2source tool (shipped with the desktop version of hUGETracker)
 2. VGM files may be exported from Deflemask or you may download some ripped sounds from games: https://vgmrips.net/packs/chip/game-boy-dmg (you may need to tweak the vgm2data.py a bit, because not all dumps may be converted as is). VGZ is simply compressed VGM, unzip those to get VGM.
