@@ -25,7 +25,7 @@ void main() {
         music_setup_timer();
         add_low_priority_TIM(music_play_isr);    
     }
-    set_interrupts(VBL_IFLAG | TIM_IFLAG);
+    set_interrupts(IE_REG | TIM_IFLAG);
 
     puts("A     - module 1\nB     - module 2\nUP    - sound 1\nDOWN  - sound 2\nLEFT  - WAVE 1\nRIGHT - WAVE 2\nSELECT- music STOP\nSTART - music PAUSE");
 
