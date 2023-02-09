@@ -72,7 +72,7 @@ inline void music_sound_cut_mask(uint8_t mask) {
 void music_play_isr(void);
 
 // load the music module
-inline void music_load(uint8_t bank, const hUGESong_t * data) {
+inline void music_load(uint8_t bank, const MUSIC_MODULE * data) {
     music_current_track_bank = MUSIC_STOP_BANK, music_next_track = data; music_current_track_bank = bank;
 }
 
