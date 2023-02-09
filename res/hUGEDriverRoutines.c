@@ -41,7 +41,7 @@ const advanced_instr_t instruments[] = {
     { BANK(snare_75), snare_75, SFX_MUTE_MASK(snare_75) },
     { BANK(kick_50),  kick_50,  SFX_MUTE_MASK(kick_50)  },
     { BANK(snare_50), snare_50, SFX_MUTE_MASK(snare_50) },
-}; 
+};
 
 void hUGETrackerRoutine(unsigned char ch, unsigned char param, unsigned char tick) NONBANKED OLDCALL {
     ch;
