@@ -1,6 +1,9 @@
 #ifndef __MUSICMANAGER_H_INCLUDE__
 #define __MUSICMANAGER_H_INCLUDE__
 
+#include <gbdk/platform.h>
+#include <stdint.h>
+
 #include "sfxplayer.h"
 #if defined(NINTENDO)
 #include "hUGEDriver.h"
@@ -31,12 +34,21 @@ extern uint8_t music_sfx_priority;
 extern uint8_t music_tick_mask;
 
 // set up timer interrupt to 256Hz and set up driver for 256Hz
-inline void music_setup_timer(void) {
+inline void music_setup_timer_ex(uint8_t is_fast) {
 #if defined(NINTENDO)
-    TMA_REG = ((_cpu == CGB_TYPE) && (*(UBYTE *)0x0143 & 0x80)) ? 0x80u : 0xC0u;
+    TMA_REG = (is_fast) ? 0x80u : 0xC0u;
     TAC_REG = 0x07u;
+#else
+    is_fast;
 #endif
     music_tick_mask = MUSIC_TICK_MASK_256HZ;
+}
+
+// set up timer interrupt to 256Hz and set up driver for 256Hz
+inline void music_setup_timer(void) {
+#if defined(NINTENDO)
+    music_setup_timer_ex((_cpu == CGB_TYPE) && (*(UBYTE *)0x0143 & 0x80));
+#endif
 }
 
 // set up driver for 60Hz
