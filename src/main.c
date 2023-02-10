@@ -4,8 +4,8 @@
 
 #include "musicmanager.h"
 
-#include "music_track_0__Data.h"
-#include "DEMOSONG.h"
+#include "song1.h"
+#include "song2.h"
 
 #include "sound_effect1.h"          // generated from VGM
 #include "sound_effect2.h"          // generated from VGM
@@ -38,8 +38,8 @@ void main(void) {
         // read joypad
         uint8_t joy = joypad();
         // play sound or music, depending on the pressed key
-        if (joy & J_A)      music_load(BANK(music_track_0__Data), &music_track_0__Data), music_pause(music_paused = FALSE);
-        if (joy & J_B)      music_load(BANK(DEMOSONG), &DEMOSONG), music_pause(music_paused = FALSE);
+        if (joy & J_A)      music_load(BANK(song1), &song1), music_pause(music_paused = FALSE);
+        if (joy & J_B)      music_load(BANK(song2), &song2), music_pause(music_paused = FALSE);
 //        if (joy & J_UP)     music_play_sfx(BANK(sound_effect1), sound_effect1, SFX_MUTE_MASK(sound_effect1), MUSIC_SFX_PRIORITY_NORMAL);
         if (joy & J_UP)     music_play_sfx(BANK(sound_effect3), sound_effect3, SFX_MUTE_MASK(sound_effect3), MUSIC_SFX_PRIORITY_NORMAL);
         if (joy & J_DOWN)   music_play_sfx(BANK(hammered_08), hammered_08, SFX_MUTE_MASK(hammered_08), MUSIC_SFX_PRIORITY_NORMAL);

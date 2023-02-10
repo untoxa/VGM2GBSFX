@@ -43,10 +43,9 @@ const advanced_instr_t instruments[] = {
     { BANK(snare_50), snare_50, SFX_MUTE_MASK(snare_50) },
 };
 
-void hUGETrackerRoutine(unsigned char ch, unsigned char param, unsigned char tick) NONBANKED OLDCALL {
-    ch;
+void hUGETrackerRoutine(unsigned char tick, unsigned int param) NONBANKED {
     if (tick) return;
-    const advanced_instr_t * instrument = instruments + (param >> 4);
+    const advanced_instr_t * instrument = instruments + ((unsigned char)(param) >> 4);
     music_play_sfx(instrument->bank, instrument->data, instrument->mute_mask, MUSIC_SFX_PRIORITY_MINIMAL);
 }
 
