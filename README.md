@@ -3,13 +3,69 @@ Convert DMG VGM files (and a few other formats) for using them as SFX in homebre
 
 ![example rom](/screenshot.png)
 
-Project requires GBDK-2020 v4.1.1: http://gbdk-2020.github.io and GNU make. A few tools are compiled into executables for windows, but you may get the linux versions (or whatever else targets) from the original repositories. Main data conversion tools are written in python.
+This project requires GBDK-2020 v4.1.1: http://gbdk-2020.github.io and GNU make. A few tools are compiled into executables for windows, but you may get the linux versions (or whatever else targets) from the original repositories. The main data conversion tools are written in python.
 
-1. music in UGE format is made with hUGETracker (standalone, or embedded into GBStudio), those are converted into C source with uge2source tool (shipped with the desktop version of hUGETracker)
-2. VGM files may be exported from Deflemask or you may download some ripped sounds from games: https://vgmrips.net/packs/chip/game-boy-dmg (you may need to tweak the vgm2data.py a bit, because not all dumps may be converted as is). VGZ is simply compressed VGM, unzip those to get VGM.
-3. dump2vgm.py is used to make VGM files from sound register dumps, created with https://github.com/mmitch/gbsplay tool from GBS files which may be found here: https://www.zophar.net/music/gameboy-gbs
-4. wav2data.py is used to convert 8KHz mono PCM WAV files
-5. fxhammer2data.py is used to convert FXHammer https://www.pouet.net/prod.php?which=17337 (native game boy tool) sound effects in SAV format which is produced by almost any game boy emulator and is simply a SRAM dump
+# Importing your music and sound effects
+
+VGM2GBSFX supports the following music and sound formats.  Each format has a tool to convert your file into a .c file that you can compile into your code.
+
+* **.uge music** - Created from hUGETracker (either standalone or from GBStudio).  Use the `utils/uge2source` tool. which is also included with hUGETracker itself.
+* **.vgm music and sound effects** - Exported from hUGETracker or Deflemask, or ripped from existing games (such as https://vgmrips.net/packs/chip/game-boy-dmg).  Use `utils/vgm2data.py`.
+  * For existing game rips, you may need to tweak the util, because not all dumps may be converted as is.
+* **.vgz compressed files** - unzip, then use `utils/vgm2data.py`.
+* **.gbs module dumps** - convert to .vgm using `utils/dump2vgm.py`, then use `utils/vgm2data.py`.
+* **.wav sound effects** - use `utils/wav2data.py`.  Only 8KHz mono PCM WAV files are supported.
+* **.sav file from FXHammer** - use `utils/fxhammer2data.py`.  FXHammer is a sound effect editor available at https://www.pouet.net/prod.php?which=17337 and can be run in almost any Game Boy emulator; the .sav file is the output of its SRAM save file.
+  * To play sound effects at the same speed as they are within FXHammer, add the `-d 4` parameter to `fxhammer2data`.
+  * `--no-pan` may be necessary to mute the correct channels.
+
+# Integration into GBDK
+
+Please follow these steps to add VGM2GBSFX into a GBDK project:
+
+## Initialization
+
+1. If you haven't already, set up hUGEDriver according to the [quick start guide](https://github.com/SuperDisk/hUGEDriver?tab=readme-ov-file#quick-start-gbdk).
+1. Copy musicmanager.c and sfxplayer.c from the src/sm83 folder of this project into your codebase.
+1. Copy musicmanager.h and sfxplayer.h from the include folder of this project into your codebase.
+1. At the start of your game, add the following:
+  ```
+    #include "musicmanager.h"
+
+    set_interrupts(IE_REG | TIM_IFLAG); // add any other interrupts as you need
+    music_init();
+
+    CRITICAL {
+      music_setup_timer();
+      add_low_priority_TIM(music_play_isr);
+    }
+  ```
+
+## Playing Music
+
+First, `#include` the compiled .h file of your song.  The .h file will include a const and a bank; import them using something like this:
+
+```
+extern const hUGESong_t songname;
+BANKREF_EXTERN(songname)
+```
+
+Then, play the song using this code.  This must be run from bank 0 to prevent crashes.
+```
+music_load(BANK(songname), &songname);
+```
+
+## Playing Sound Effects
+
+`#include` the .h file exported from your sound effect file.  Then play the sound effect using this:
+```
+music_play_sfx(
+  BANK(sfx_id),
+  sfx_id,
+  SFX_MUTE_MASK(sfx_id),
+  priority_number, // a priority number; higher priority sound effects interrupt lower priority sound effects
+);
+```
 
 # Data format description:
 
